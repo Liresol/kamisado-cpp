@@ -117,7 +117,7 @@ class Piece {
 			return false;
 		}
 	}
-//Finds which "path" a move would be on, if possible. A value of -1 means the move is not possible, a value of 3 means the main diagonal, a value of 2 means a vertical move, and a value of 1 means the other diagonal.
+//Finds which "path" a move would be on, if possible. A value of -1 means the move is not possible, a value of 3 means the main diagonal (like in a matrix), a value of 2 means a vertical move, and a value of 1 means the other diagonal.
 	int onPath(int a, int b) {
 		int bufh = pos[0];
 		int bufv = pos[1];
@@ -194,5 +194,26 @@ class Piece {
 		if(sumo == 2) {moveRange = 3;}
 		if(sumo == 3) {moveRange = 1;}
 		if(sumo == 4) {moveRange = 0;}
+	}
+
+	int getMoveRange() {
+		return moveRange;
+	}
+
+	color getColor() {
+		return col;
+	}
+
+	bool isDummy() {
+		if(col == none) {return true;}
+		return false;
+	}
+
+	int score() {
+		if(sumo == 0) {return 0;}
+		if(sumo == 1) {return 1;}
+		if(sumo == 2) {return 3;}
+		if(sumo == 3) {return 7;}
+		if(sumo == 4) {return 15;}
 	}
 };

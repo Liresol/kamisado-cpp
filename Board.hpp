@@ -18,15 +18,23 @@ class Board {
 		//blackTurn = true;
 	}
 
-	bool occupied(int h, int v) {
+	bool occupied(int x, int y) {
 		for(int i=0;i<8;i++) {
-			if(BPieces[i].x() == h && BPieces[i].y() == v) {return true;}
-			if(WPieces[i].x() == h && WPieces[i].y() == v) {return true;}
+			if(BPieces[i].x() == x && BPieces[i].y() == y) {return true;}
+			if(WPieces[i].x() == x && WPieces[i].y() == y) {return true;}
 		}
 		return false;
 	}
 
-	//Sets the colors for every square on th board.
+	Piece occPiece(int x, int y) {
+		for(int i=0;i<8;i++) {
+			if(BPieces[i].x() == x && BPieces[i].y() == y) {return WPieces[i];}
+			if(WPieces[i].x() == x && WPieces[i].y() == y) {return WPieces[i];}
+		}
+		return Piece();
+	}
+
+	//Sets the colors for every square on the board.
 	void initField() {
 		field[0][0] = field[1][1] = field[2][2] = field[3][3] = field[4][4] = field[5][5] = field[6][6] = field[7][7] = brown;
 		field[1][0] = field[4][1] = field[7][2] = field[2][3] = field[5][4] = field[0][5] = field[3][6] = field[6][7] = green;
@@ -48,19 +56,19 @@ class Board {
 				case 1: for(int i=1;i<p.dist(h,v); i++) {
 						if(occupied(p.x()-i, p.y()-i)) {return false;}
 					}
-					if(!occupied(p.x()-p.dist(h,v), p.y()-p.dist(h,v)) || (p.getSumo()>0 && p.onPath(h,v) == 2)) {return true;}
+					if(!occupied(p.x()-p.dist(h,v), p.y()-p.dist(h,v))) {return true;}
 					else {return false;}
 					break;
 				case 2: for(int i=1;i<p.dist(h,v); i++) {
 						if(occupied(p.x(), p.y()-i)) {return false;}
 					}
-					if(!occupied(p.x(), p.y()-p.dist(h,v)) || (p.getSumo()>0 && p.onPath(h,v) == 2)) {return true;}
+					if(!occupied(p.x(), p.y()-p.dist(h,v))) {return true;}
 					else {return false;}
 					break;
 				case 3: for(int i=1;i<p.dist(h,v); i++) {
 						if(occupied(p.x()+i, p.y()-i)) {return false;}
 					}
-					if(!occupied(p.x()+p.dist(h,v), p.y()-p.dist(h,v)) || (p.getSumo()>0 && p.onPath(h,v) == 2)) {return true;}
+					if(!occupied(p.x()+p.dist(h,v), p.y()-p.dist(h,v))) {return true;}
 					else {return false;}
 					break;
 				default: return false; break;
@@ -72,19 +80,19 @@ class Board {
 				case 1: for(int i=1;i<p.dist(h,v); i++) {
 						if(occupied(p.x()+i, p.y()+i)) {return false;}
 					}
-					if(!occupied(p.x()+p.dist(h,v), p.y()+p.dist(h,v)) || (p.getSumo()>0 && p.onPath(h,v) == 2)) {return true;}
+					if(!occupied(p.x()+p.dist(h,v), p.y()+p.dist(h,v))) {return true;}
 					else {return false;}
 					break;
 				case 2: for(int i=1;i<p.dist(h,v); i++) {
 						if(occupied(p.x(), p.y()+i)) {return false;}
 					}
-					if(!occupied(p.x(), p.y()+p.dist(h,v)) || (p.getSumo()>0 && p.onPath(h,v) == 2)) {return true;}
+					if(!occupied(p.x(), p.y()+p.dist(h,v))) {return true;}
 					else {return false;}
 					break;
 				case 3: for(int i=1;i<p.dist(h,v); i++) {
 						if(occupied(p.x()-i, p.y()+i)) {return false;}
 					}
-					if(!occupied(p.x()-p.dist(h,v), p.y()+p.dist(h,v)) || (p.getSumo()>0 && p.onPath(h,v) == 2)) {return true;}
+					if(!occupied(p.x()-p.dist(h,v), p.y()+p.dist(h,v))) {return true;}
 					else {return false;}
 					break;
 				default: return false; break;
@@ -94,6 +102,23 @@ class Board {
 		}
 		return false;
 		
+	}
+
+	bool canSumoPush(Piece p, int x, int y) {
+		int s = p.getSumo();
+		int line = 0;
+		if(s == 0) {return false;}
+		if(p.onPath(x,y) != 2) {return false;}
+		if(p.dist(x,y) >= p.getMoveRange()) {return false;}
+		for(int i=1;i<=s;i++) {
+			if(occupied(x,y+i)) {line += 1;}
+			if(occPiece(x,y+i).getSumo() >= s) {return false;}
+		}
+		if(line > s) {return false;}
+		if(line == s) {
+			if(occupied(x,y+s+1)) {return false;}
+		}
+		return true;
 	}
 
 	//Checking for the possibility of a move is still incomplete.
