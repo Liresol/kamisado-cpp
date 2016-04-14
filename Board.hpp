@@ -3,6 +3,7 @@
 #include "Piece.hpp"
 
 class Board {
+	friend class Game;
 	//bool blackTurn;
 	Piece WPieces[8];
 	Piece BPieces[8];
@@ -121,12 +122,12 @@ class Board {
 		return true;
 	}
 
-	//Checking for the possibility of a move is still incomplete.
-/*	void move(Piece p, int x, int y) {
-		if(!(blackTurn != p.isBlack()) && canMove(p,x,y)) {
+	//Performs the move of a piece if possible.
+	//Checking for the possibility of a move may still be incomplete.
+	void move(Piece p, int x, int y) {
+		if(canMove(p,x,y) || canSumoPush(p,x,y)){
 			p.uMove(x,y);
-			blackTurn = !blackTurn;
 		}
-	}*/
+	}
 
 };

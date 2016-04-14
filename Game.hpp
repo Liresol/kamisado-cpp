@@ -13,8 +13,8 @@ class Game {
 		scoreB = 0;
 	}
 
-	Game(Board,turnV) {
-		GameB = Board;
+	Game(Board BoardV, bool turnV) {
+		GameB = BoardV;
 		blackTurn = turnV;
 		scoreW = 0;
 		scoreB = 0;
@@ -24,8 +24,8 @@ class Game {
 		int bufW = 0;
 		int bufB = 0;
 		for(int i=0;i<8;i++) {
-			bufW += WPieces[i].score();
-			bufB += BPieces[i].score();
+			bufW += GameB.WPieces[i].score();
+			bufB += GameB.BPieces[i].score();
 		}
 		scoreW = bufW;
 		scoreB = bufB;

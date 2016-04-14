@@ -173,7 +173,6 @@ class Piece {
 	}
 
 	int getSumo() {return sumo;}
-
 	int x() {return pos[0];}
 	int y() {return pos[1];}
 	bool isBlack() {return Black;}
@@ -182,6 +181,8 @@ class Piece {
 
 	//Does not check whether the move is possible.
 	void uMove(int x, int y) {
+		pos[0] = x;
+		pos[1] = y;
 	}
 
 	void promote() {
@@ -215,5 +216,6 @@ class Piece {
 		if(sumo == 2) {return 3;}
 		if(sumo == 3) {return 7;}
 		if(sumo == 4) {return 15;}
+		return 0;
 	}
 };
