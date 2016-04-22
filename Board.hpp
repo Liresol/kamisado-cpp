@@ -3,8 +3,6 @@
 #include "Piece.hpp"
 
 class Board {
-	friend class Game;
-	//bool blackTurn;
 	Piece WPieces[8];
 	Piece BPieces[8];
 	color field[8][8];
@@ -16,15 +14,26 @@ class Board {
 			WPieces[i] = Piece(false,0,cConvert(i));
 			BPieces[i] = Piece(true,0,cConvert(i));
 		}
-		//blackTurn = true;
 	}
 
+	//COORDINATES START FROM 0 AND GO TO 7.
 	bool occupied(int x, int y) {
 		for(int i=0;i<8;i++) {
 			if(BPieces[i].x() == x && BPieces[i].y() == y) {return true;}
 			if(WPieces[i].x() == x && WPieces[i].y() == y) {return true;}
 		}
 		return false;
+	}
+
+	//Returns a piece according to the following: 0-7 return the black pieces, 8-15 return the white pieces, and everything else returns a dummy.
+	Piece mapPiece(int p) {
+		if(0 <= p && p <= 7) {
+			return BPieces[p];
+		}
+		if(8 <= p && p <= 15) {
+			return WPieces[p-8];
+		}
+		return Piece();
 	}
 
 	Piece occPiece(int x, int y) {
@@ -122,12 +131,55 @@ class Board {
 		return true;
 	}
 
+	//Checks to see if the piece can move at all.
+	bool locked(Piece p) {
+		if(p.isBlack()) {
+			return canMove(p,p.x()-1,p.y()+1) && canMove(p,p.x(),p.y()+1) && canMove(p,p.x()+1,p.y()+1) && canSumoPush(p,p.x(),p.y()+1);
+		}
+		else {
+			return canMove(p,p.x()-1,p.y()-1) && canMove(p,p.x(),p.y()-1) && canMove(p,p.x()+1,p.y()-1) && canSumoPush(p,p.x(),p.y()-1);
+		}
+	}
+
 	//Performs the move of a piece if possible.
 	//Checking for the possibility of a move may still be incomplete.
 	void move(Piece p, int x, int y) {
-		if(canMove(p,x,y) || canSumoPush(p,x,y)){
+		if(canMove(p,x,y) != canSumoPush(p,x,y)){
 			p.uMove(x,y);
 		}
+	}
+	
+	//Teleports a piece to a position, given that it is not currently taken by another piece.
+	void teleport(Piece p, int x, int y) {
+		if(!occupied(x,y)) {
+		p.uMove(x,y);
+		}
+	}
+
+	//Swaps the positions of two pieces.
+	void swap(Piece p, Piece q) {
+		int buf[2];
+		buf[0] = p.x();
+		buf[1] = p.y();
+		p.uMove(q.x(),q.y());
+		q.uMove(buf[0],buf[1]);
+	}
+
+	//Checks the board to see if there are 8 white pieces and 8 black pieces, all on different positions.
+	bool validate() {
+		int nB = 0;
+		int nW = 0;
+		for(int y=0;y<8;y++) {
+			for(int x=0;x<8;x++) {
+				if(occupied(x,y)) {
+					if(occPiece(x,y).isBlack()) {nB += 1;}
+					if(occPiece(x,y).isBlack()) {nW += 1;}
+					else {return false;}
+				}
+			}
+		}
+		if(nB == 8 && nW == 8) {return true;}
+		return false;
 	}
 
 };

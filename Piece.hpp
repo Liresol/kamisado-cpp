@@ -14,8 +14,9 @@ color cConvert(int i) {
 	else {return none;}
 }
 
+//Defines each piece that will be used in the board.
 class Piece {
-	//When initializing, set the sumo and moveRange things.
+	//Position is a matrix with 2 entries, which are effectively the x and y positions. Black is on the bottom (low y) and White is on the top (high y).
 	int pos[2];
 	int sumo;
 	bool Black;
