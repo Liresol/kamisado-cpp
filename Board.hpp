@@ -1,6 +1,11 @@
-#include <vector>
-#include <array>
 #include "Piece.hpp"
+
+//Effectively a "piece id". May not be useful at all.
+enum id {
+	Bn, Bg, Br, By, Bi, Bu, Bl, Bo,
+	Wn, Wg, Wr, Wy, Wi, Wu, Wl, Wo
+};
+//BLACK IS ON TOP, MAY REQUIRE SERIOUS CHANGES
 
 class Board {
 	Piece WPieces[8];
@@ -16,7 +21,27 @@ class Board {
 		}
 	}
 
-	//COORDINATES START FROM 0 AND GO TO 7.
+	//Does nothing, but may be used for mapping piece IDs onto pieces.
+	Piece MapID(id i) {
+		if(i == Bn) {return BPieces[0];}
+		if(i == Bg) {return BPieces[1];}
+		if(i == Br) {return BPieces[2];}
+		if(i == By) {return BPieces[3];}
+		if(i == Bi) {return BPieces[4];}
+		if(i == Bu) {return BPieces[5];}
+		if(i == Bl) {return BPieces[6];}
+		if(i == Bo) {return BPieces[7];}
+		if(i == Wn) {return WPieces[0];}
+		if(i == Wg) {return WPieces[1];}
+		if(i == Wr) {return WPieces[2];}
+		if(i == Wy) {return WPieces[3];}
+		if(i == Wi) {return WPieces[4];}
+		if(i == Wu) {return WPieces[5];}
+		if(i == Wl) {return WPieces[6];}
+		if(i == Wo) {return WPieces[7];}
+		else {return Piece();}
+	}
+	//COORDINATES START FROM 0 AND GO TO 7
 	bool occupied(int x, int y) {
 		for(int i=0;i<8;i++) {
 			if(BPieces[i].x() == x && BPieces[i].y() == y) {return true;}
@@ -114,6 +139,12 @@ class Board {
 		
 	}
 
+	bool canMove(int id, int x, int y) {
+		if(id >= 0 && id < 8) {return canMove(BPieces[id],x,y);}
+		if(id >= 8 && id < 16) {return canMove(WPieces[id-8],x,y);}
+		return false;
+	}
+
 	bool canSumoPush(Piece p, int x, int y) {
 		int s = p.getSumo();
 		int line = 0;
@@ -131,6 +162,12 @@ class Board {
 		return true;
 	}
 
+	bool canSumoPush(int id, int x, int y) {
+		if(id >= 0 && id < 8) {return canSumoPush(BPieces[id],x,y);}
+		if(id >= 8 && id < 16) {return canSumoPush(WPieces[id-8],x,y);}
+		return false;
+	}
+
 	//Checks to see if the piece can move at all.
 	bool locked(Piece p) {
 		if(p.isBlack()) {
@@ -142,7 +179,6 @@ class Board {
 	}
 
 	//Performs the move of a piece if possible.
-	//Checking for the possibility of a move may still be incomplete.
 	void move(Piece p, int x, int y) {
 		if(canMove(p,x,y) != canSumoPush(p,x,y)){
 			p.uMove(x,y);
@@ -152,7 +188,7 @@ class Board {
 	//Teleports a piece to a position, given that it is not currently taken by another piece.
 	void teleport(Piece p, int x, int y) {
 		if(!occupied(x,y)) {
-		p.uMove(x,y);
+			p.uMove(x,y);
 		}
 	}
 
@@ -166,7 +202,7 @@ class Board {
 	}
 
 	//Checks the board to see if there are 8 white pieces and 8 black pieces, all on different positions.
-	bool validate() {
+	bool valid() {
 		int nB = 0;
 		int nW = 0;
 		for(int y=0;y<8;y++) {

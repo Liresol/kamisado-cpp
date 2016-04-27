@@ -1,5 +1,8 @@
 #include "Board.hpp"
+#include <array>
 
+
+//For future reference: n is Brown, g is Green, r is Red, y is Yellow, i is Pink, u is Purple, l is Blue, and o is Orange
 class Game {
 	Board GameB;
 	bool blackTurn;
@@ -20,18 +23,88 @@ class Game {
 		scoreB = 0;
 	}
 
+	Board getBoard() {
+		return GameB;
+	}
+
 	void setScore() {
 		int bufW = 0;
 		int bufB = 0;
 		for(int i=0;i<8;i++) {
-			bufW += GameB.WPieces[i].score();
-			bufB += GameB.BPieces[i].score();
+			bufW += GameB.mapPiece(i+8).score();
+			bufB += GameB.mapPiece(i).score();
 		}
 		scoreW = bufW;
 		scoreB = bufB;
 	}
 
-	void resetBoard() {
+	//INCOMPLETE
+	bool deadlocked() {
+		return false;
+	}
+
+	//INCOMPLETE
+	void resetBoard(bool Left) {
+		if(Left) {fillLeft();}
+		else {fillRight();}
+	}
+
+	//INCOMPLETE
+	void fillLeft() {
+		color WBuf[8];
+		color BBuf[8];
+		int buf=0;
+		for(int y=0;y<8;y++) {
+			for(int x=0;x<8;x++) {
+				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isBlack()) {
+					BBuf[buf] = GameB.occPiece(x,y).getColor();
+					buf += 1;
+						}
+			}
+		}
+		for(int y=7;y>=0;y--) {
+			for(int x=7;x>=0;x--) {
+				if(GameB.occupied(x,y) && !GameB.occPiece(x,y).isBlack()) {
+					WBuf[buf] = GameB.occPiece(x,y).getColor();
+					buf += 1;
+						}
+			}
+		}
+		GameB = Board();
+	}
+	
+	//INCOMPLETE
+	void fillRight() {
+		Piece WBuf[8];
+		Piece BBuf[8];
+		int buf=0;
+		for(int y=0;y<8;y++) {
+			for(int x=0;x<8;x++) {
+				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isBlack()) {
+					BBuf[buf] = GameB.occPiece(x,y);
+					buf += 1;
+						}
+			}
+		}
+		for(int y=7;y>=0;y--) {
+			for(int x=0;x<8;x--) {
+				if(GameB.occupied(x,y) && !GameB.occPiece(x,y).isBlack()) {
+					WBuf[buf] = GameB.occPiece(x,y);
+					buf += 1;
+						}
+			}
+		}
+
+	}
+
+	void resetGame() {
+		GameB = Board();
+		scoreB = scoreW = 0;
+		blackTurn = true;
+	}
+
+	//INCOMPLETE
+	void turn() {
 	}
 
 

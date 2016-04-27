@@ -1,3 +1,5 @@
+#include <iostream>
+
 enum color {
 	brown, green, red, yellow, pink, purple, blue, orange, none
 };
@@ -14,9 +16,21 @@ color cConvert(int i) {
 	else {return none;}
 }
 
+int invConvert(color C) {
+	if(C == brown) {return 0;}
+	if(C == green) {return 1;}
+	if(C == red) {return 2;}
+	if(C == yellow) {return 3;}
+	if(C == pink) {return 4;}
+	if(C == purple) {return 5;}
+	if(C == blue) {return 6;}
+	if(C == orange) {return 7;}
+	else {return -1;}
+}
+
 //Defines each piece that will be used in the board.
 class Piece {
-	//Position is a matrix with 2 entries, which are effectively the x and y positions. Black is on the bottom (low y) and White is on the top (high y).
+	//Position is a matrix with 2 entries, which are effectively the x and y positions. White is on the bottom (low y) and Black is on the top (high y).
 	int pos[2];
 	int sumo;
 	bool Black;
@@ -67,6 +81,7 @@ class Piece {
 			if(colval == purple) {pos[0] = 6;}
 			if(colval == blue) {pos[0] = 7;}
 			if(colval == orange) {pos[0] = 8;}
+			else {pos[0] = -1;}
 		}
 		setMoveRange();
 	}
@@ -218,5 +233,24 @@ class Piece {
 		if(sumo == 3) {return 7;}
 		if(sumo == 4) {return 15;}
 		return 0;
+	}
+
+//Prints out a string that corresponds to the piece. Mainly for debugging right now.
+	void toString() {
+		if(Black) {std::cout << "black and ";}
+		else {std::cout << "white and ";}
+
+		if(col == brown) {std::cout << "brown" << std::endl;}
+		else if(col == green) {std::cout << "green" << std::endl;}
+		else if(col == red) {std::cout << "red" << std::endl;}
+		else if(col == yellow) {std::cout << "yellow" << std::endl;}
+		else if(col == pink) {std::cout << "pink" << std::endl;}
+		else if(col == purple) {std::cout << "purple" << std::endl;}
+		else if(col == blue) {std::cout << "blue" << std::endl;}
+		else if(col == orange) {std::cout << "orange" << std::endl;}
+		else {std::cout << "is a dummy" << std::endl;}
+
+		std::cout << pos[0] << ", " << pos[1] << std::endl;
+		std::cout << sumo << std::endl;
 	}
 };
