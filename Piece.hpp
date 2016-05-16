@@ -1,4 +1,6 @@
 #include <iostream>
+#define BLACK true
+#define WHITE false
 
 enum color {
 	brown, green, red, yellow, pink, purple, blue, orange, none
@@ -63,27 +65,38 @@ class Piece {
 		if(Black) {
 			pos[1] = 8;
 			if(colval == brown) {pos[0] = 8;}
-			if(colval == green) {pos[0] = 7;}
-			if(colval == red) {pos[0] = 6;}
-			if(colval == yellow) {pos[0] = 5;}
-			if(colval == pink) {pos[0] = 4;}
-			if(colval == purple) {pos[0] = 3;}
-			if(colval == blue) {pos[0] = 2;}
-			if(colval == orange) {pos[0] = 1;}
+			else if(colval == green) {pos[0] = 7;}
+			else if(colval == red) {pos[0] = 6;}
+			else if(colval == yellow) {pos[0] = 5;}
+			else if(colval == pink) {pos[0] = 4;}
+			else if(colval == purple) {pos[0] = 3;}
+			else if(colval == blue) {pos[0] = 2;}
+			else if(colval == orange) {pos[0] = 1;}
 		}
 		else {
 			pos[1] = 1;
 			if(colval == brown) {pos[0] = 1;}
-			if(colval == green) {pos[0] = 2;}
-			if(colval == red) {pos[0] = 3;}
-			if(colval == yellow) {pos[0] = 4;}
-			if(colval == pink) {pos[0] = 5;}
-			if(colval == purple) {pos[0] = 6;}
-			if(colval == blue) {pos[0] = 7;}
-			if(colval == orange) {pos[0] = 8;}
+			else if(colval == green) {pos[0] = 2;}
+			else if(colval == red) {pos[0] = 3;}
+			else if(colval == yellow) {pos[0] = 4;}
+			else if(colval == pink) {pos[0] = 5;}
+			else if(colval == purple) {pos[0] = 6;}
+			else if(colval == blue) {pos[0] = 7;}
+			else if(colval == orange) {pos[0] = 8;}
 			else {pos[0] = -1;}
 		}
 		setMoveRange();
+	}
+
+	Piece operator= (const Piece copyFrom) {
+		pos[0] = copyFrom.pos[0];
+		pos[1] = copyFrom.pos[1];
+		sumo = copyFrom.sumo;
+		Black = copyFrom.Black;
+		col = copyFrom.col;
+		moveRange = copyFrom.moveRange;
+		return *this;
+
 	}
 
 	bool isMovePossible(int a, int b) {

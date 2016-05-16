@@ -24,30 +24,34 @@ class Board {
 	//Does nothing, but may be used for mapping piece IDs onto pieces.
 	Piece MapID(id i) {
 		if(i == Bn) {return BPieces[0];}
-		if(i == Bg) {return BPieces[1];}
-		if(i == Br) {return BPieces[2];}
-		if(i == By) {return BPieces[3];}
-		if(i == Bi) {return BPieces[4];}
-		if(i == Bu) {return BPieces[5];}
-		if(i == Bl) {return BPieces[6];}
-		if(i == Bo) {return BPieces[7];}
-		if(i == Wn) {return WPieces[0];}
-		if(i == Wg) {return WPieces[1];}
-		if(i == Wr) {return WPieces[2];}
-		if(i == Wy) {return WPieces[3];}
-		if(i == Wi) {return WPieces[4];}
-		if(i == Wu) {return WPieces[5];}
-		if(i == Wl) {return WPieces[6];}
-		if(i == Wo) {return WPieces[7];}
+		else if(i == Bg) {return BPieces[1];}
+		else if(i == Br) {return BPieces[2];}
+		else if(i == By) {return BPieces[3];}
+		else if(i == Bi) {return BPieces[4];}
+		else if(i == Bu) {return BPieces[5];}
+		else if(i == Bl) {return BPieces[6];}
+		else if(i == Bo) {return BPieces[7];}
+		else if(i == Wn) {return WPieces[0];}
+		else if(i == Wg) {return WPieces[1];}
+		else if(i == Wr) {return WPieces[2];}
+		else if(i == Wy) {return WPieces[3];}
+		else if(i == Wi) {return WPieces[4];}
+		else if(i == Wu) {return WPieces[5];}
+		else if(i == Wl) {return WPieces[6];}
+		else if(i == Wo) {return WPieces[7];}
 		else {return Piece();}
 	}
-	//COORDINATES START FROM 0 AND GO TO 7
+	//CHANGE COORDINATES TO INCLUDE 8
 	bool occupied(int x, int y) {
-		for(int i=0;i<8;i++) {
+		for(int i=1;i<=8;i++) {
 			if(BPieces[i].x() == x && BPieces[i].y() == y) {return true;}
 			if(WPieces[i].x() == x && WPieces[i].y() == y) {return true;}
 		}
 		return false;
+	}
+
+	color color(int x, int y) {
+		return field[x][y];
 	}
 
 	//Returns a piece according to the following: 0-7 return the black pieces, 8-15 return the white pieces, and everything else returns a dummy.
@@ -179,17 +183,23 @@ class Board {
 	}
 
 	//Performs the move of a piece if possible.
-	void move(Piece p, int x, int y) {
+	void move(Piece& p, int x, int y) {
 		if(canMove(p,x,y) != canSumoPush(p,x,y)){
 			p.uMove(x,y);
 		}
 	}
-	
+
 	//Teleports a piece to a position, given that it is not currently taken by another piece.
-	void teleport(Piece p, int x, int y) {
+	void teleport(Piece& p, int x, int y) {
 		if(!occupied(x,y)) {
 			p.uMove(x,y);
 		}
+	}
+
+	void teleport(id I, int x, int y) {
+		if(!occupied(x,y)) {
+		}
+		MapID(I).toString();
 	}
 
 	//Swaps the positions of two pieces.
@@ -218,4 +228,9 @@ class Board {
 		return false;
 	}
 
+	bool invalid() {return !valid();}
+
+	void toString(id I) {
+		MapID(I).toString();
+	}
 };
