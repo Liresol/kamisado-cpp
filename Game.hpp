@@ -2,7 +2,6 @@
 #include <array>
 
 
-//For future reference: n is Brown, g is Green, r is Red, y is Yellow, i is Pink, u is Purple, l is Blue, and o is Orange
 class Game {
 	Board GameB;
 	bool blackTurn;
@@ -102,6 +101,7 @@ class Game {
 		scoreB = scoreW = 0;
 		blackTurn = true;
 	}
+
 
 	//INCOMPLETE
 	void turn() {
