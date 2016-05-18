@@ -1,11 +1,14 @@
 #include "Piece.hpp"
 #include <array>
 
+namespace kamisadoCPP
+{
 
 //For future reference: n is Brown, g is Green, r is Red, y is Yellow, i is Pink, u is Purple, l is Blue, and o is Orange
 enum id {
 	Bn, Bg, Br, By, Bi, Bu, Bl, Bo,
-	Wn, Wg, Wr, Wy, Wi, Wu, Wl, Wo
+	Wn, Wg, Wr, Wy, Wi, Wu, Wl, Wo,
+	NA
 };
 
 bool isBetweenExc(int i, int low, int high) {
@@ -23,6 +26,67 @@ bool intIsWhite(int i) {
 bool intIsBlack(int i) {
 	return isBetweenInc(i, 0, 7);
 }
+
+bool validCoordinate(int x, int y) {
+	return isBetweenInc(x,1,8) && isBetweenInc(y,1,8);
+}
+/*
+ *Bn, Bg, Br, By, Bi, Bu, Bl, Bo,
+	Wn, Wg, Wr, Wy, Wi, Wu, Wl, Wo
+
+ */
+int intID(id I) {
+	if (I == Bn) {return 0;}
+	else if(I == Bg) {return 1;}
+	else if(I == Br) {return 2;}
+	else if(I == By) {return 3;}
+	else if(I == Bi) {return 4;}
+	else if(I == Bu) {return 5;}
+	else if(I == Bl) {return 6;}
+	else if(I == Bo) {return 7;}
+	else if(I == Wn) {return 8;}
+	else if(I == Wg) {return 9;}
+	else if(I == Wr) {return 10;}
+	else if(I == Wy) {return 11;}
+	else if(I == Wi) {return 12;}
+	else if(I == Wu) {return 13;}
+	else if(I == Wl) {return 14;}
+	else if(I == Wo) {return 15;}
+	else {return -1;}
+}
+
+id integerToID(int i) {
+	if (i == 0) {return Bn;}
+	else if(i == 1) {return Bg;}
+	else if(i == 2) {return Br;}
+	else if(i == 3) {return By;}
+	else if(i == 4) {return Bi;}
+	else if(i == 5) {return Bu;}
+	else if(i == 6) {return Bl;}
+	else if(i == 7) {return Bo;}
+	else if(i == 8) {return Wn;}
+	else if(i == 9) {return Wg;}
+	else if(i == 10) {return Wr;}
+	else if(i == 11) {return Wy;}
+	else if(i == 12) {return Wi;}
+	else if(i == 13) {return Wu;}
+	else if(i == 14) {return Wl;}
+	else if(i == 15) {return Wo;}
+	else {return NA;}
+}
+
+id ID(color c, bool Black) {
+	int buf;
+	if(Black) {
+		buf = invConvert(c);
+		return integerToID(buf);
+	}
+	else {
+		buf = invConvert(c)+8;
+		return integerToID(buf);
+	}
+}
+
 //BLACK IS ON TOP, MAY REQUIRE SERIOUS CHANGES
 
 class Board {
@@ -64,30 +128,6 @@ class Board {
 		else if(i == Wo) {return WPieces[7];}
 		else {return Piece();}
 	}
-/*
- *Bn, Bg, Br, By, Bi, Bu, Bl, Bo,
-	Wn, Wg, Wr, Wy, Wi, Wu, Wl, Wo
-
- */
-	int intID(id I) {
-		if (I == Bn) {return 0;}
-		else if(I == Bg) {return 1;}
-		else if(I == Br) {return 2;}
-		else if(I == By) {return 3;}
-		else if(I == Bi) {return 4;}
-		else if(I == Bu) {return 5;}
-		else if(I == Bl) {return 6;}
-		else if(I == Bo) {return 7;}
-		else if(I == Wn) {return 8;}
-		else if(I == Wg) {return 9;}
-		else if(I == Wr) {return 10;}
-		else if(I == Wy) {return 11;}
-		else if(I == Wi) {return 12;}
-		else if(I == Wu) {return 13;}
-		else if(I == Wl) {return 14;}
-		else if(I == Wo) {return 15;}
-		else {return -1;}
-	}
 	//CHANGE COORDINATES TO INCLUDE 8
 	bool occupied(int x, int y) {
 		for(int i=1;i<=8;i++) {
@@ -101,6 +141,12 @@ class Board {
 	color colorIn(int x, int y) {
 		if(!isBetweenInc(x,1,8) || !isBetweenInc(y,1,8)) {return none;}
 		return field[8*y+x-9];
+	}
+
+	color colorIn(id I) {
+		int bufx = MapID(I).x();
+		int bufy = MapID(I).y();
+		return colorIn(bufx,bufy);
 	}
 
 	//Prints the color in the given coordinates (1 to 8)
@@ -129,12 +175,25 @@ class Board {
 	}
 
 	Piece occPiece(int x, int y) {
-		for(int i=0;i<8;i++) {
-			if(BPieces[i].x() == x && BPieces[i].y() == y) {return WPieces[i];}
+		for(int i=1;i<=8;i++) {
+			if(BPieces[i].x() == x && BPieces[i].y() == y) {return BPieces[i];}
 			if(WPieces[i].x() == x && WPieces[i].y() == y) {return WPieces[i];}
 		}
 		return Piece();
 	}
+
+	int occInt(int x, int y) {
+		for(int i=1;i<=8;i++) {
+			if(BPieces[i].x() == x && BPieces[i].y() == y) {return i;}
+			if(WPieces[i].x() == x && WPieces[i].y() == y) {return i+8;}
+		}
+		return -1;
+	}
+
+	id occID(int x, int y){
+		return integerToID(occInt(x,y));
+	}
+
 
 		//Checks whether or not a piece can move to a certain position.
 	bool canMove(Piece p, int h, int v) {
@@ -216,6 +275,14 @@ class Board {
 		return true;
 	}
 
+	bool canTakeTurn(Piece p, int x, int y) {
+		return (canMove(p,x,y) != canSumoPush(p,x,y));
+	}
+
+	bool canTakeTurn(id I, int x, int y) {
+		return (canMove(MapID(I),x,y) != canSumoPush(MapID(I),x,y));
+	}
+
 	bool canSumoPush(int id, int x, int y) {
 		if(id >= 0 && id < 8) {return canSumoPush(BPieces[id],x,y);}
 		if(id >= 8 && id < 16) {return canSumoPush(WPieces[id-8],x,y);}
@@ -223,13 +290,33 @@ class Board {
 	}
 
 	//Checks to see if the piece can move at all.
-	bool locked(Piece p) {
+	bool notLocked(Piece p) {
 		if(p.isBlack()) {
 			return canMove(p,p.x()-1,p.y()+1) && canMove(p,p.x(),p.y()+1) && canMove(p,p.x()+1,p.y()+1) && canSumoPush(p,p.x(),p.y()+1);
 		}
 		else {
 			return canMove(p,p.x()-1,p.y()-1) && canMove(p,p.x(),p.y()-1) && canMove(p,p.x()+1,p.y()-1) && canSumoPush(p,p.x(),p.y()-1);
 		}
+	}
+
+	bool notLocked(int i) {
+		return notLocked(integerToID(i));
+	}
+
+	bool notLocked(id I) {
+		return notLocked(MapID(I));
+	}
+
+	bool locked(Piece p) {
+		return !notLocked(p);
+	}
+
+	bool locked(int i) {
+		return !notLocked(i);
+	}
+
+	bool locked(id I) {
+		return !notLocked(I);
 	}
 
 	//Performs the move of a piece if possible.
@@ -293,6 +380,57 @@ class Board {
 		else if(intIsBlack(i) && intIsBlack(j)) {swap(BPieces[i], BPieces[j]);}
 	}
 
+	void swap(id I, id J) {
+		swap(intID(I),intID(J));
+	}
+
+	void swap(int x1, int y1, int x2, int y2) {
+		if(occupied(x1, y1) && occupied(x2, y2)){
+			swap(occID(x1,y1),occID(x2,y2));
+		}
+	}
+
+	void swap(id I, int x, int y) {
+		if(occupied(x,y)) {
+			swap(I,occID(x,y));
+		}
+	}
+
+	void swap(int i, id I) {
+		swap(i, intID(I));
+	}
+
+	bool blackWin() {
+		for(int x=1;x<=8;x+=1) {
+			if(occPiece(x,1).isBlack()) {return true;}
+		}
+		return false;
+	}
+
+	bool whiteWin() {
+		for(int x=1;x<=8;x+=1) {
+			if(occPiece(x,8).isWhite()) {return true;}
+		}
+		return false;
+	}
+
+	void roundCheck() {
+		if(blackWin()) {
+			for(int x=1;x<=8;x+=1) {
+				if(isBlackPiece(occInt(x,1))) {
+					BPieces[occInt(x,1)].promote();
+				}
+			}
+		}
+		if(whiteWin()) {
+			for(int x=1;x<=8;x+=1) {
+				if(isBlackPiece(occInt(x,8))) {
+					WPieces[occInt(x,8)-8].promote();
+				}
+			}
+		}
+	}
+
 	//Checks the board to see if there are 8 white pieces and 8 black pieces, all on different positions.
 	bool valid() {
 		int nB = 0;
@@ -312,11 +450,15 @@ class Board {
 
 	bool invalid() {return !valid();}
 
-	void toString(id I) {
-		MapID(I).toString();
+	void printOut(id I) {
+		MapID(I).printOut();
 	}
 
 	
 };
 
 const std::array<color,64> Board::field = {brown,green,red,yellow,pink,purple,blue,orange,purple,brown,yellow,blue,green,pink,orange,red,blue,yellow,brown,purple,red,orange,pink,green,yellow,red,green,brown,orange,blue,purple,pink,pink,purple,blue,orange,brown,green,red,yellow,green,pink,orange,red,purple,brown,yellow,blue,red,orange,pink,green,blue,yellow,brown,purple,orange,blue,purple,pink,yellow,red,green,brown};
+
+
+
+};

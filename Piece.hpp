@@ -2,31 +2,36 @@
 #define BLACK true
 #define WHITE false
 
+namespace kamisadoCPP
+{
+
 enum color {
 	brown, green, red, yellow, pink, purple, blue, orange, none
 };
 
+//Maps colors onto integers.
 color cConvert(int i) {
 	if(i == 0) {return brown;}
-	if(i == 1) {return green;}
-	if(i == 2) {return red;}
-	if(i == 3) {return yellow;}
-	if(i == 4) {return pink;}
-	if(i == 5) {return purple;}
-	if(i == 6) {return blue;}
-	if(i == 7) {return orange;}
+	else if(i == 1) {return green;}
+	else if(i == 2) {return red;}
+	else if(i == 3) {return yellow;}
+	else if(i == 4) {return pink;}
+	else if(i == 5) {return purple;}
+	else if(i == 6) {return blue;}
+	else if(i == 7) {return orange;}
 	else {return none;}
 }
 
+//Maps integers onto colors.
 int invConvert(color C) {
 	if(C == brown) {return 0;}
-	if(C == green) {return 1;}
-	if(C == red) {return 2;}
-	if(C == yellow) {return 3;}
-	if(C == pink) {return 4;}
-	if(C == purple) {return 5;}
-	if(C == blue) {return 6;}
-	if(C == orange) {return 7;}
+	else if(C == green) {return 1;}
+	else if(C == red) {return 2;}
+	else if(C == yellow) {return 3;}
+	else if(C == pink) {return 4;}
+	else if(C == purple) {return 5;}
+	else if(C == blue) {return 6;}
+	else if(C == orange) {return 7;}
 	else {return -1;}
 }
 
@@ -88,6 +93,7 @@ class Piece {
 		setMoveRange();
 	}
 
+	//Defines the assignment operator.
 	Piece operator= (const Piece copyFrom) {
 		pos[0] = copyFrom.pos[0];
 		pos[1] = copyFrom.pos[1];
@@ -99,6 +105,7 @@ class Piece {
 
 	}
 
+	//Given no other pieces on the board, finds whether a move is possible.
 	bool isMovePossible(int a, int b) {
 		int bufh = pos[0];
 		int bufv = pos[1];
@@ -194,6 +201,8 @@ class Piece {
 		}
 		return -1;
 	}
+
+	//Finds the taxicab distance between two points.
 	int dist(int h, int v) {
 		if(pos[0] == h && pos[1] == v) {return 0;}
 		if(!isMovePossible(h,v)) {return -1;}
@@ -208,7 +217,7 @@ class Piece {
 	bool isWhite() {return !Black;}
 	int range() {return moveRange;}
 
-	//Does not check whether the move is possible.
+	//Moves a piece. Does not check whether the move is possible.
 	void uMove(int x, int y) {
 		pos[0] = x;
 		pos[1] = y;
@@ -248,8 +257,8 @@ class Piece {
 		return 0;
 	}
 
-//Prints out a string that corresponds to the piece. Mainly for debugging right now.
-	void toString() {
+//Prints out a string that corresponds to the piece's properties. Mainly for debugging right now.
+	void printOut() {
 		if(Black) {std::cout << "black and ";}
 		else {std::cout << "white and ";}
 
@@ -266,4 +275,9 @@ class Piece {
 		std::cout << pos[0] << ", " << pos[1] << std::endl;
 		std::cout << sumo << std::endl;
 	}
+};
+
+
+
+
 };

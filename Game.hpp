@@ -1,12 +1,22 @@
 #include "Board.hpp"
-#include <array>
+#include <string>
+#define FROM_LEFT true
+#define FROM_RIGHT false
+#define BLACK_TURN true
+#define WHITE_TURN false
 
+namespace kamisadoCPP
+{
+
+//Because the Game class is a synthesis of previous classes (and thus much more messy below the surface), functions not explicitly tested will be labeled.
 
 class Game {
 	Board GameB;
 	bool blackTurn;
 	int scoreW;
 	int scoreB;
+	id BMove;
+	id WMove;
 
 	public:
 	Game() {
@@ -37,64 +47,112 @@ class Game {
 		scoreB = bufB;
 	}
 
-	//INCOMPLETE
-	bool deadlocked() {
+	id currentMover() {
+		if(blackTurn) {
+			return BMove;
+		}
+		else {return WMove;}
+	}
+
+	//UNTESTED
+	bool deadlockCheck() {
+		id Locked[16];
+		for(int i=0;i<16;i+=1) {
+			if(GameB.locked(currentMover())){
+				Locked[i] = currentMover();
+				for(int j=0;j<i;j+=1) {
+					if(Locked[j] == Locked[i]) {return true;}
+				}
+				turnSwitch();
+			}
+			else {return false;}
+		}
+
 		return false;
 	}
 
-	//INCOMPLETE
+	//UNTESTED
+	void assignMove(color c, bool EndingTurn) {
+		id buf; buf = ID(c,EndingTurn);
+		color endC = GameB.colorIn(buf);
+		if(EndingTurn == BLACK_TURN) {
+			WMove = ID(endC, WHITE_TURN);
+		}
+		else {
+			BMove = ID(endC, BLACK_TURN);
+		}
+	}
+
+	//UNTESTED
+	void turnSwitch() {
+		assignMove(GameB.colorIn(BMove),blackTurn);
+		blackTurn = !blackTurn;
+	}
+
 	void resetBoard(bool Left) {
 		if(Left) {fillLeft();}
 		else {fillRight();}
 	}
 
-	//INCOMPLETE
+	//UNTESTED
+	//Fills from left to right.
 	void fillLeft() {
-		color WBuf[8];
-		color BBuf[8];
+		id WBuf[8];
+		id BBuf[8];
 		int buf=0;
-		for(int y=0;y<8;y++) {
-			for(int x=0;x<8;x++) {
+		for(int y=1;y<=8;y++) {
+			for(int x=1;x<=8;x++) {
 				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isBlack()) {
-					BBuf[buf] = GameB.occPiece(x,y).getColor();
+					WBuf[buf] = GameB.occID(x,y);
 					buf += 1;
 						}
 			}
 		}
-		for(int y=7;y>=0;y--) {
-			for(int x=7;x>=0;x--) {
+		buf = 0;
+		for(int y=8;y>0;y--) {
+			for(int x=8;x>0;x--) {
 				if(GameB.occupied(x,y) && !GameB.occPiece(x,y).isBlack()) {
-					WBuf[buf] = GameB.occPiece(x,y).getColor();
+					BBuf[buf] = GameB.occID(x,y);
 					buf += 1;
 						}
 			}
 		}
 		GameB = Board();
+		for(int i=0;i<8;i+=1) {
+			GameB.swap(WBuf[i],1,i+1);
+			GameB.swap(BBuf[i],8,8-i);
+		}
 	}
 	
-	//INCOMPLETE
+	//UNTESTED
+	//Fills from right to left.
 	void fillRight() {
-		Piece WBuf[8];
-		Piece BBuf[8];
+		id WBuf[8];
+		id BBuf[8];
 		int buf=0;
-		for(int y=0;y<8;y++) {
-			for(int x=0;x<8;x++) {
+		for(int y=1;y<=8;y++) {
+			for(int x=8;x<=1;x--) {
 				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isBlack()) {
-					BBuf[buf] = GameB.occPiece(x,y);
+					WBuf[buf] = GameB.occID(x,y);
 					buf += 1;
 						}
 			}
 		}
-		for(int y=7;y>=0;y--) {
-			for(int x=0;x<8;x--) {
+		buf = 0;
+		for(int y=8;y>0;y--) {
+			for(int x=1;x<8;x++) {
 				if(GameB.occupied(x,y) && !GameB.occPiece(x,y).isBlack()) {
-					WBuf[buf] = GameB.occPiece(x,y);
+					BBuf[buf] = GameB.occID(x,y);
 					buf += 1;
 						}
 			}
 		}
-
-	}
+		GameB = Board();
+		for(int i=0;i<8;i+=1) {
+			GameB.swap(WBuf[i],1,i+1);
+			GameB.swap(BBuf[i],8,8-i);
+		}
+		}
 
 	void resetGame() {
 		GameB = Board();
@@ -102,10 +160,18 @@ class Game {
 		blackTurn = true;
 	}
 
-
-	//INCOMPLETE
-	void turn() {
+	bool winnerCheck(int threshold) {
+		setScore();
+		if(scoreB >= threshold) {
+			return true;
+		}
+		else if(scoreW >= threshold) {
+			return true;
+		}
+		return false;
 	}
+
+};
 
 
 };
