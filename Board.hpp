@@ -417,14 +417,14 @@ class Board {
 	void roundCheck() {
 		if(blackWin()) {
 			for(int x=1;x<=8;x+=1) {
-				if(isBlackPiece(occInt(x,1))) {
+				if(intIsBlack(occInt(x,1))) {
 					BPieces[occInt(x,1)].promote();
 				}
 			}
 		}
 		if(whiteWin()) {
 			for(int x=1;x<=8;x+=1) {
-				if(isBlackPiece(occInt(x,8))) {
+				if(intIsWhite(occInt(x,8))) {
 					WPieces[occInt(x,8)-8].promote();
 				}
 			}
