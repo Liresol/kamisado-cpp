@@ -11,6 +11,8 @@ enum id {
 	NA
 };
 
+//Note that Pieces of the board can be encoded in three different ways: The objects themselves, integers representing the objects, and piece ids.
+
 bool isBetweenExc(int i, int low, int high) {
 	return (i > low && i < high);
 }
@@ -400,16 +402,38 @@ class Board {
 		swap(i, intID(I));
 	}
 
+	void promotePiece(Piece& p) {
+		p.promote();
+	}
+	void promotePiece(int id) {
+		if(intIsWhite(id)) {
+			WPieces[id-8].promote();
+		}
+		else if(intIsBlack(id)) {
+			BPieces[id].promote();
+		}
+	}
+
+	void promotePiece(id I) {
+		promotePiece(intID(I));
+	}
+
 	bool blackWin() {
 		for(int x=1;x<=8;x+=1) {
-			if(occPiece(x,1).isBlack()) {return true;}
+			if(occPiece(x,1).isBlack()) {
+				promotePiece(occInt(x,1));
+				return true;
+			}
 		}
 		return false;
 	}
 
 	bool whiteWin() {
 		for(int x=1;x<=8;x+=1) {
-			if(occPiece(x,8).isWhite()) {return true;}
+			if(occPiece(x,8).isWhite()) {
+				promotePiece(occInt(x,8));
+				return true;}
+
 		}
 		return false;
 	}

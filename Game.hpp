@@ -55,13 +55,14 @@ class Game {
 	}
 
 	//UNTESTED
+	//Promotes the last deadlocked piece in expectation of a board reset.
 	bool deadlockCheck() {
 		id Locked[16];
 		for(int i=0;i<16;i+=1) {
 			if(GameB.locked(currentMover())){
 				Locked[i] = currentMover();
 				for(int j=0;j<i;j+=1) {
-					if(Locked[j] == Locked[i]) {return true;}
+					if(Locked[j] == Locked[i]) {GameB.promotePiece(Locked[i-1]); return true;}
 				}
 				turnSwitch();
 			}
@@ -89,9 +90,34 @@ class Game {
 		blackTurn = !blackTurn;
 	}
 
-	void resetBoard(bool Left) {
+	void fillBoard(bool Left) {
 		if(Left) {fillLeft();}
 		else {fillRight();}
+	}
+
+	//INCOMPLETE
+	void newRound(bool FillLeft) {
+		int BS[8];
+		int WS[8];
+		for(int x=1;x<=8;x+=1) {
+			for(int y=1;y<=8;y+=1) {
+				if(GameB.occInt(x,y) >= 8) {
+					WS[GameB.occInt(x,y)] = GameB.occPiece(x,y).getSumo();
+				}
+				if(isBetweenInc(GameB.occInt(x,y),0,7)) {
+					BS[GameB.occInt(x,y)] = GameB.occPiece(x,y).getSumo();
+				}
+			}
+		}
+		fillBoard(FillLeft);
+		for(int i=0;i<8;i+=1) {
+			for(int j=0;j<BS[i];j+=1) {
+				GameB.promotePiece(i);
+			}
+			for(int j=0;j<WS[i];j+=1) {
+				GameB.promotePiece(i+8);
+			}
+		}
 	}
 
 	//UNTESTED
