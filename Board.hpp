@@ -28,7 +28,6 @@ bool intIsWhite(int i) {
 bool intIsBlack(int i) {
 	return isBetweenInc(i, 0, 7);
 }
-
 bool validCoordinate(int x, int y) {
 	return isBetweenInc(x,1,8) && isBetweenInc(y,1,8);
 }
@@ -76,6 +75,15 @@ id integerToID(int i) {
 	else if(i == 15) {return Wo;}
 	else {return NA;}
 }
+
+bool IDIsWhite(id I) {
+	return intIsWhite(intID(I));
+}
+
+bool IDIsBlack(id I) {
+	return intIsBlack(intID(I));
+}
+
 
 id ID(color c, bool Black) {
 	int buf;

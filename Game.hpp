@@ -1,7 +1,7 @@
 #include "Board.hpp"
 #include <string>
-#define FROM_LEFT true
-#define FROM_RIGHT false
+#define FILL_LEFT true
+#define FILL_RIGHT false
 #define BLACK_TURN true
 #define WHITE_TURN false
 
@@ -11,12 +11,14 @@ namespace kamisadoCPP
 //Because the Game class is a synthesis of previous classes (and thus much more messy below the surface), functions not explicitly tested will be labeled.
 
 class Game {
+	protected:
 	Board GameB;
 	bool blackTurn;
 	int scoreW;
 	int scoreB;
 	id BMove;
 	id WMove;
+	unsigned int winThreshold;
 
 	public:
 	Game() {
@@ -30,6 +32,15 @@ class Game {
 		blackTurn = turnV;
 		scoreW = 0;
 		scoreB = 0;
+		winThreshold = 1;
+	}
+
+	Game(Board BoardV, bool turnV, int winT) {
+		GameB = BoardV;
+		blackTurn = turnV;
+		scoreW = 0;
+		scoreB = 0;
+		winThreshold = winT;
 	}
 
 	Board getBoard() {
@@ -70,6 +81,26 @@ class Game {
 		}
 
 		return false;
+	}
+
+	//UNTESTED
+	id lastNonDeadlocked() {
+		if(!deadlockCheck()) {return NA;}
+	id Locked[16];
+		for(int i=0;i<16;i+=1) {
+			if(GameB.locked(currentMover())){
+				Locked[i] = currentMover();
+				for(int j=0;j<i;j+=1) {
+					if(Locked[j] == Locked[i]) {return Locked[i-1];}
+				}
+				turnSwitch();
+			}
+			else {return NA;}
+		}
+
+		return NA;
+	
+
 	}
 
 	//UNTESTED
@@ -195,6 +226,18 @@ class Game {
 			return true;
 		}
 		return false;
+	}
+
+	bool winnerCheck() {
+		return winnerCheck(winThreshold);
+	}
+
+	//UNTESTED
+	int determineWinner() {
+		if(!winnerCheck(winThreshold)) {return 0;}
+		if(scoreB >= winThreshold) {return 1;}
+		if(scoreW >= winThreshold) {return 2;}
+		else {return 0;}
 	}
 
 };
