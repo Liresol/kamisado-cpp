@@ -97,18 +97,36 @@ id ID(color c, bool Black) {
 	}
 }
 
+void printID(id I) {
+	int buf = intID(I);
+	if(buf == -1) {std::cout << "NA" << std::endl;}
+	if(buf >= 8) {std::cout << "W";
+		buf -= 8;
+	}
+	else {std::cout << "B";}
+	if(buf == 0) {std::cout << "n" << std::endl;}
+	if(buf == 1) {std::cout << "g" << std::endl;}
+	if(buf == 2) {std::cout << "r" << std::endl;}
+	if(buf == 3) {std::cout << "y" << std::endl;}
+	if(buf == 4) {std::cout << "i" << std::endl;}
+	if(buf == 5) {std::cout << "u" << std::endl;}
+	if(buf == 6) {std::cout << "l" << std::endl;}
+	if(buf == 7) {std::cout << "o" << std::endl;}
+}
+
 //BLACK IS ON TOP, MAY REQUIRE SERIOUS CHANGES
 
 class Board {
 	Piece WPieces[8];
 	Piece BPieces[8];
 	static const std::array<color, 64> field;
+	bool roundOver = false;
 
 	public:
 	Board() {
 		for(int i=0;i<8;i++) {
-			WPieces[i] = Piece(false,0,cConvert(i));
-			BPieces[i] = Piece(true,0,cConvert(i));
+			WPieces[i] = Piece(WHITE,0,cConvert(i));
+			BPieces[i] = Piece(BLACK,0,cConvert(i));
 		}
 	}
 	Board operator= (const Board copyFrom) {
@@ -140,7 +158,7 @@ class Board {
 	}
 	//CHANGE COORDINATES TO INCLUDE 8
 	bool occupied(int x, int y) {
-		for(int i=1;i<=8;i++) {
+		for(int i=0;i<8;i++) {
 			if(BPieces[i].x() == x && BPieces[i].y() == y) {return true;}
 			if(WPieces[i].x() == x && WPieces[i].y() == y) {return true;}
 		}
@@ -185,7 +203,7 @@ class Board {
 	}
 
 	Piece occPiece(int x, int y) {
-		for(int i=1;i<=8;i++) {
+		for(int i=0;i<8;i++) {
 			if(BPieces[i].x() == x && BPieces[i].y() == y) {return BPieces[i];}
 			if(WPieces[i].x() == x && WPieces[i].y() == y) {return WPieces[i];}
 		}
@@ -193,7 +211,7 @@ class Board {
 	}
 
 	int occInt(int x, int y) {
-		for(int i=1;i<=8;i++) {
+		for(int i=0;i<8;i++) {
 			if(BPieces[i].x() == x && BPieces[i].y() == y) {return i;}
 			if(WPieces[i].x() == x && WPieces[i].y() == y) {return i+8;}
 		}
@@ -302,10 +320,10 @@ class Board {
 	//Checks to see if the piece can move at all.
 	bool notLocked(Piece p) {
 		if(p.isBlack()) {
-			return canMove(p,p.x()-1,p.y()+1) && canMove(p,p.x(),p.y()+1) && canMove(p,p.x()+1,p.y()+1) && canSumoPush(p,p.x(),p.y()+1);
+			return canMove(p,p.x()-1,p.y()-1) || canMove(p,p.x(),p.y()-1) || canMove(p,p.x()+1,p.y()-1) || canSumoPush(p,p.x(),p.y()-1);
 		}
 		else {
-			return canMove(p,p.x()-1,p.y()-1) && canMove(p,p.x(),p.y()-1) && canMove(p,p.x()+1,p.y()-1) && canSumoPush(p,p.x(),p.y()-1);
+			return canMove(p,p.x()-1,p.y()+1) || canMove(p,p.x(),p.y()+1) || canMove(p,p.x()+1,p.y()+1) || canSumoPush(p,p.x(),p.y()+1);
 		}
 	}
 
@@ -334,7 +352,7 @@ class Board {
 		if(canMove(p,x,y) != canSumoPush(p,x,y)){
 			p.uMove(x,y);
 		}
-		else {std::cout << "Debugging is good." << std::endl;}
+		else {std::cout << "Looks like there is a bug somewhere." << std::endl;}
 	}
 
 	void move(int id, int x, int y) {
@@ -374,6 +392,7 @@ class Board {
 		}
 	}
 
+
 	//Swaps the positions of two pieces.
 	void swap(Piece& p, Piece& q) {
 		int buf[2];
@@ -404,10 +423,32 @@ class Board {
 		if(occupied(x,y)) {
 			swap(I,occID(x,y));
 		}
+		else {
+			MapID(I).uMove(x,y);
+		}
 	}
 
 	void swap(int i, id I) {
 		swap(i, intID(I));
+	}
+
+
+	//WARNING: MIGHT BREAK THE GAME
+	void uWarp(Piece& p, int x, int y){
+		p.uMove(x,y);
+	}
+
+	void uWarp(int i, int x, int y) {
+		if(intIsBlack(i)) {
+			uWarp(BPieces[i],x,y);
+		}
+		if(intIsWhite(i)) {
+			uWarp(WPieces[i-8],x,y);
+		}
+	}
+
+	void uWarp(id I, int x, int y) {
+		uWarp(intID(I),x,y);
 	}
 
 	void promotePiece(Piece& p) {
@@ -428,8 +469,12 @@ class Board {
 
 	bool blackWin() {
 		for(int x=1;x<=8;x+=1) {
-			if(occPiece(x,1).isBlack()) {
-				promotePiece(occInt(x,1));
+			Piece buf = occPiece(x,1);
+			if(buf.isBlack() && buf.isNotDummy()) {
+				if(!roundOver) {promotePiece(occInt(x,1));
+				}
+
+				roundOver = true;
 				return true;
 			}
 		}
@@ -437,30 +482,20 @@ class Board {
 	}
 
 	bool whiteWin() {
+		if(roundOver) {return false;}
 		for(int x=1;x<=8;x+=1) {
-			if(occPiece(x,8).isWhite()) {
-				promotePiece(occInt(x,8));
+			Piece buf = occPiece(x,8);
+			if(buf.isWhite() && buf.isNotDummy()) {
+				if(!roundOver) {promotePiece(occInt(x,8));}
+				roundOver = true;
 				return true;}
 
 		}
 		return false;
 	}
 
-	void roundCheck() {
-		if(blackWin()) {
-			for(int x=1;x<=8;x+=1) {
-				if(intIsBlack(occInt(x,1))) {
-					BPieces[occInt(x,1)].promote();
-				}
-			}
-		}
-		if(whiteWin()) {
-			for(int x=1;x<=8;x+=1) {
-				if(intIsWhite(occInt(x,8))) {
-					WPieces[occInt(x,8)-8].promote();
-				}
-			}
-		}
+	bool roundWon() {
+		return (whiteWin() || blackWin());
 	}
 
 	//Checks the board to see if there are 8 white pieces and 8 black pieces, all on different positions.
@@ -484,6 +519,11 @@ class Board {
 
 	void printOut(id I) {
 		MapID(I).printOut();
+	}
+	void printOut() {
+		for(int i=0;i<=15;i+=1) {
+			MapID(integerToID(i)).printOut();
+		}
 	}
 
 	

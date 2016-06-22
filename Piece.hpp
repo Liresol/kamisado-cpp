@@ -248,6 +248,10 @@ class Piece {
 		return false;
 	}
 
+	bool isNotDummy() {
+		return !isDummy();
+	}
+
 	int score() {
 		if(sumo == 0) {return 0;}
 		if(sumo == 1) {return 1;}

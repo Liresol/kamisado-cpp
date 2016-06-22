@@ -65,6 +65,10 @@ class Game {
 		else {return WMove;}
 	}
 
+	Piece moverPiece() {
+		return GameB.MapID(currentMover());
+	}
+
 	//UNTESTED
 	//Promotes the last deadlocked piece in expectation of a board reset.
 	bool deadlockCheck() {
@@ -73,7 +77,8 @@ class Game {
 			if(GameB.locked(currentMover())){
 				Locked[i] = currentMover();
 				for(int j=0;j<i;j+=1) {
-					if(Locked[j] == Locked[i]) {GameB.promotePiece(Locked[i-1]); return true;}
+					if(Locked[j] == Locked[i]) {GameB.promotePiece(Locked[i-1]); 
+						return true;}
 				}
 				turnSwitch();
 			}
@@ -117,7 +122,7 @@ class Game {
 
 	//UNTESTED
 	void turnSwitch() {
-		assignMove(GameB.colorIn(BMove),blackTurn);
+		assignMove(GameB.colorIn(currentMover()),blackTurn);
 		blackTurn = !blackTurn;
 	}
 
@@ -126,27 +131,25 @@ class Game {
 		else {fillRight();}
 	}
 
-	//INCOMPLETE
 	void newRound(bool FillLeft) {
-		int BS[8];
-		int WS[8];
+		int S[16];
+		for(int i=0;i<16;i+=1) {
+			S[i] = 0;
+		}
 		for(int x=1;x<=8;x+=1) {
 			for(int y=1;y<=8;y+=1) {
-				if(GameB.occInt(x,y) >= 8) {
-					WS[GameB.occInt(x,y)] = GameB.occPiece(x,y).getSumo();
-				}
-				if(isBetweenInc(GameB.occInt(x,y),0,7)) {
-					BS[GameB.occInt(x,y)] = GameB.occPiece(x,y).getSumo();
-				}
+				if(GameB.occInt(x,y) >= 0) {S[GameB.occInt(x,y)] = GameB.occPiece(x,y).getSumo();}
 			}
 		}
+		/*
+		for(int i=0;i<16;i+=1) {
+			std::cout << S[i] << std::endl;
+		}
+		*/
 		fillBoard(FillLeft);
-		for(int i=0;i<8;i+=1) {
-			for(int j=0;j<BS[i];j+=1) {
+		for(int i=0;i<16;i+=1) {
+			for(int j=0;j<S[i];j+=1) {
 				GameB.promotePiece(i);
-			}
-			for(int j=0;j<WS[i];j+=1) {
-				GameB.promotePiece(i+8);
 			}
 		}
 	}
@@ -159,8 +162,9 @@ class Game {
 		int buf=0;
 		for(int y=1;y<=8;y++) {
 			for(int x=1;x<=8;x++) {
-				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isBlack()) {
+				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isWhite()) {
 					WBuf[buf] = GameB.occID(x,y);
+					printID(WBuf[buf]);
 					buf += 1;
 						}
 			}
@@ -168,7 +172,7 @@ class Game {
 		buf = 0;
 		for(int y=8;y>0;y--) {
 			for(int x=8;x>0;x--) {
-				if(GameB.occupied(x,y) && !GameB.occPiece(x,y).isBlack()) {
+				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isBlack()) {
 					BBuf[buf] = GameB.occID(x,y);
 					buf += 1;
 						}
@@ -176,29 +180,39 @@ class Game {
 		}
 		GameB = Board();
 		for(int i=0;i<8;i+=1) {
-			GameB.swap(WBuf[i],1,i+1);
-			GameB.swap(BBuf[i],8,8-i);
+			GameB.uWarp(WBuf[i], i+1, 2);
+			GameB.uWarp(BBuf[i], 8-i, 7);
+		}
+		for(int i=0;i<8;i+=1) {
+			GameB.uWarp(WBuf[i], i+1, 1);
+			GameB.uWarp(BBuf[i], 8-i, 8);
 		}
 	}
 	
 	//UNTESTED
 	//Fills from right to left.
 	void fillRight() {
+		std::cout << "PRINTING RIGHT" << std::endl;
+		std::cout << "PRINTING RIGHT" << std::endl;
+		std::cout << "PRINTING RIGHT" << std::endl;
+		std::cout << "PRINTING RIGHT" << std::endl;
+		std::cout << "PRINTING RIGHT" << std::endl;
+		std::cout << "PRINTING RIGHT" << std::endl;
 		id WBuf[8];
 		id BBuf[8];
 		int buf=0;
 		for(int y=1;y<=8;y++) {
-			for(int x=8;x<=1;x--) {
-				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isBlack()) {
+			for(int x=8;x>0;x--) {
+				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isWhite()) {
 					WBuf[buf] = GameB.occID(x,y);
 					buf += 1;
-						}
+				}
 			}
 		}
 		buf = 0;
 		for(int y=8;y>0;y--) {
-			for(int x=1;x<8;x++) {
-				if(GameB.occupied(x,y) && !GameB.occPiece(x,y).isBlack()) {
+			for(int x=1;x<=8;x++) {
+				if(GameB.occupied(x,y) && GameB.occPiece(x,y).isBlack()) {
 					BBuf[buf] = GameB.occID(x,y);
 					buf += 1;
 						}
@@ -206,8 +220,12 @@ class Game {
 		}
 		GameB = Board();
 		for(int i=0;i<8;i+=1) {
-			GameB.swap(WBuf[i],1,i+1);
-			GameB.swap(BBuf[i],8,8-i);
+			GameB.uWarp(WBuf[i], i+1, 2);
+			GameB.uWarp(BBuf[i], 8-i, 7);
+		}
+		for(int i=0;i<8;i+=1) {
+			GameB.uWarp(WBuf[i], i+1, 1);
+			GameB.uWarp(BBuf[i], 8-i, 8);
 		}
 		}
 
@@ -215,6 +233,13 @@ class Game {
 		GameB = Board();
 		scoreB = scoreW = 0;
 		blackTurn = true;
+	}
+
+	//1 if Black, 2 if White, 0 if none
+	int roundWinner() {
+		if(GameB.whiteWin()) {return 2;}
+		if(GameB.blackWin()) {return 1;}
+		else {return 0;}
 	}
 
 	bool winnerCheck(int threshold) {
@@ -232,13 +257,28 @@ class Game {
 		return winnerCheck(winThreshold);
 	}
 
-	//UNTESTED
 	int determineWinner() {
 		if(!winnerCheck(winThreshold)) {return 0;}
 		if(scoreB >= winThreshold) {return 1;}
 		if(scoreW >= winThreshold) {return 2;}
 		else {return 0;}
 	}
+	void printBoard() {
+		GameB.printOut();
+	}
+	/*Piece occPiece(int x,int y) {
+		return GameB.occPiece(x,y);
+	}
+	
+	int occInt(int x, int y) {
+		return GameB.occInt(x,y);
+	}
+	id occID(int x, int y) {
+		return GameB.occID(x,y);
+	}
+	bool occupied(int x, int y) {
+		return GameB.occupied(x,y);
+	}*/
 
 };
 
